@@ -1,4 +1,4 @@
-import 'package:sports_hub/menu.dart';
+import 'package:sports_hub/screens/menu.dart';
 import 'package:flutter/material.dart';
 
 void main() {

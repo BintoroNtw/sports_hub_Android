@@ -70,3 +70,36 @@ Apa yang dilakukan: Memuat ulang seluruh kode aplikasi dan memulai ulang aplikas
 Kecepatan: Lebih lambat dari Hot Reload (beberapa detik), tetapi jauh lebih cepat daripada stop dan run (Full Restart).
 State (Memori): Hilang (direset). Aplikasi akan kembali ke keadaan awal (halaman utama, form kosong).
 Kapan digunakan: Diperlukan ketika Anda mengubah sesuatu yang fundamental, seperti mengubah constructor global, static variable, atau data inisialisasi awal (misalnya di main()) yang tidak bisa ditangani oleh Hot Reload.
+
+
+Tugas 8
+1.Jelaskan perbedaan antara Navigator.push() dan Navigator.pushReplacement() pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
+Navigator Push menambahkan rute (halaman) baru ke atas stack (tumpukan) navigasi. Halaman yang lama masih ada di bawahnya.Penggunaannya seperti pengguna dapat menekan tombol "back" di appbar untuk kembali ke halaman sebelumnya.
+Di Sports hub digunakan untuk membuka halaman "tambah produk".
+Navigatpr.pushReplacement() mengganti halaman saat ini di stack ke halaman yang baru.Halaman yang lama akan dihapus.Pengguna tidak bisa menekan tombol "back" untuk kembali kehalaman yang diganti.
+Di sports hub digunakan saat drawer menekan tombol halaman utama.
+
+2.Bagaimana kamu memanfaatkan hierarchy widget seperti Scaffold, AppBar, dan Drawer untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
+Struktur hierarki ini adalah kunci untuk membangun UI yang konsisten:
+Scaffold: Ini adalah "kerangka" dasar untuk setiap halaman. Dengan menggunakan Scaffold di menu.dart dan productList_form.dart, kami memastikan kedua halaman memiliki struktur visual yang sama (tahu di mana harus meletakkan AppBar, body, dan Drawer).
+AppBar: Ini adalah header aplikasi. Dengan menempatkannya di properti appBar milik Scaffold, kami menjamin AppBar selalu muncul di bagian atas dengan gaya, warna (diambil dari ThemeData), dan tinggi yang konsisten. AppBar juga cukup pintar untuk secara otomatis menampilkan tombol drawer (hamburger) atau tombol "Back" tergantung pada tumpukan navigasi.
+Drawer: Ini adalah menu navigasi global. Dengan membuat satu widget kustom (LeftDrawer) dan memberikannya ke properti drawer di setiap Scaffold (MyHomePage dan ProductFormPage), kami memastikan bahwa pengguna bisa mengakses menu navigasi yang sama persis dari halaman mana pun di aplikasi. Ini menciptakan pengalaman pengguna yang konsisten dan dapat diprediksi.
+Semua ini menjadi template yg kami gunakan kembali di seluruh aplikasi.
+
+3. Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti Padding, SingleChildScrollView, dan ListView saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
+   Dalam mendesain form di productList_form.dart, widget layout ini sangat penting:
+Padding:
+Kelebihan: Memberi "ruang bernapas" (whitespace) di sekitar elemen UI. Tanpa Padding, TextFormField dan tombol akan menempel langsung ke tepi layar dan satu sama lain, membuatnya terlihat berantakan dan sulit digunakan.
+Contoh: Kami membungkus setiap TextFormField dengan Padding(padding: const EdgeInsets.all(8.0), ...) untuk memberi jarak yang rapi antar field input.
+SingleChildScrollView:
+Kelebihan: Ini adalah widget krusial untuk form. Saat pengguna mengetuk TextFormField (misalnya "Deskripsi"), keyboard akan muncul
+dan menutupi bagian bawah layar. Tanpa SingleChildScrollView, field input atau tombol "Save" di bagian bawah akan tertutup oleh keyboard dan pengguna tidak bisa scroll, sehingga menyebabkan Bottom Overflow Error.
+Contoh: Kami membungkus seluruh Form yang berisi Column dari TextFormField kami dengan SingleChildScrollView. Ini memastikan seluruh form bisa di-scroll ke atas saat keyboard muncul.
+ListView:
+Kelebihan: Mirip dengan SingleChildScrollView, ListView menyediakan scrolling otomatis. Kelebihan utamanya adalah efisiensi memori untuk daftar yang sangat panjang (karena me-render item sesuai kebutuhan), tetapi dalam konteks drawer kami, ListView digunakan untuk kesederhanaan.
+Contoh: Di left_drawer.dart, ListView digunakan untuk menampung DrawerHeader dan ListTile ("Halaman Utama", "Tambah Produk"). Ini memastikan bahwa jika kami menambahkan lebih banyak menu di masa depan, drawer itu sendiri akan menjadi scrollable dan tidak akan overflow.
+4. Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
+Dengan mendefinisikan primarySwatch (palet warna utama) sebagai Colors.blue di satu tempat, kami mendapatkan manfaat:
+Konsistensi Otomatis: Widget Flutter seperti AppBar secara otomatis menggunakan warna primary dari tema ini sebagai background default-nya. Inilah sebabnya AppBar di menu.dart dan productList_form.dart memiliki warna yang sama tanpa perlu kami setel warnanya satu per satu.
+Branding Terpusat: Jika suatu hari brand "Sports Hub" memutuskan untuk ganti warna dari biru menjadi hijau, kami tidak perlu mengedit puluhan file. Kami hanya perlu mengubah primarySwatch: Colors.blue menjadi primarySwatch: Colors.green di satu tempat (main.dart), dan seluruh aplikasi akan otomatis berganti warna.
+Warna Aksen: Warna secondary (yang kami setel ke blueAccent) dapat digunakan untuk elemen interaktif seperti tombol atau toggle, menciptakan hierarki visual yang jelas.

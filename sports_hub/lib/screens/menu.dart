@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sports_hub/widgets/left_drawer.dart';
+import 'package:sports_hub/screens/productList_form.dart';
+import 'package:sports_hub/widgets/product_card.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -14,7 +17,7 @@ class MyHomePage extends StatelessWidget {
     ItemHomepage("Create Product", Icons.add_box, Colors.red),
   ];
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -27,6 +30,7 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -64,73 +68,20 @@ class MyHomePage extends StatelessWidget {
                     crossAxisCount: 3,
                     shrinkWrap: true,
                     children: items.map((ItemHomepage item) {
-                      return ItemCard(item);
+                      // Perubahan: Memberikan 'ProductFormPage' sebagai 'targetPage'
+                      // jika itemnya adalah 'Create Product'
+                      Widget? targetPage;
+                      if (item.name == "Create Product") {
+                        targetPage = const ProductFormPage();
+                      }
+
+                      return ItemCard(item, targetPage: targetPage);
                     }).toList(),
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-  final Color color;
-
-  const ItemHomepage(this.name, this.icon, this.color);
-}
-
-class ItemCard extends StatelessWidget {
-  // Menampilkan kartu dengan ikon dan nama.
-
-  final ItemHomepage item;
-  const ItemCard(this.item, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      // Menggunakan warna dari objek item
-      color: item.color,
-      // Membuat sudut kartu melengkung
-      borderRadius: BorderRadius.circular(12),
-
-      child: InkWell(
-        // Aksi saat kartu ditekan
-        onTap: () {
-          // Memunculkan SnackBar sesuai nama tombol
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
-            );
-        },
-        // Container untuk menyimpan icon dan text
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              // Menyusun icon dan text menjadi di tengah kartu
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
-                ),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
