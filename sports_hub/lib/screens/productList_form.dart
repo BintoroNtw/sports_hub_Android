@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sports_hub/widgets/left_drawer.dart';
 import 'package:flutter/services.dart';
 
-
 class ProductFormPage extends StatefulWidget {
   const ProductFormPage({super.key});
 

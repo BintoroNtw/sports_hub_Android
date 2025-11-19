@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:sports_hub/screens/product_entry_list.dart';
+import 'package:flutter/material.dart';
+import 'package:sports_hub/screens/productlist_form.dart';
+import 'package:sports_hub/screens/product_entry_list.dart';
+import 'package:sports_hub/screens/login.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class ItemHomepage {
   final String name;
@@ -18,6 +25,7 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Material(
       // Menggunakan warna dari objek item
       color: item.color,
@@ -26,26 +34,53 @@ class ItemCard extends StatelessWidget {
 
       child: InkWell(
         // Aksi saat kartu ditekan
-        onTap: () {
-          // Memunculkan SnackBar sesuai nama tombol
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-                SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
-            );
+          onTap: () async {
+            // SnackBar
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                  SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!"))
+              );
 
-          // === TAMBAHAN KODE NAVIGASI ===
-          // Cek jika ada halaman tujuan (targetPage) yang diberikan
-          if (targetPage != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => targetPage!,
-              ),
-            );
-          }
-          // === AKHIR TAMBAHAN KODE NAVIGASI ===
-        },
+            if (item.name == "Add Product") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductFormPage()),
+              );
+            }
+
+            else if (item.name == "See Product") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductEntryListPage()),
+              );
+            }
+
+            else if (item.name == "Logout") {
+              final response = await request.logout(
+                "http://localhost:8000/auth/logout/",
+              );
+              String message = response["message"];
+              if (context.mounted) {
+                if (response['status']) {
+                  String uname = response["username"];
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("$message See you again, $uname.")),
+                  );
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(message)),
+                  );
+                }
+              }
+            }
+          },
         // Container untuk menyimpan icon dan text
         child: Container(
           padding: const EdgeInsets.all(8),
