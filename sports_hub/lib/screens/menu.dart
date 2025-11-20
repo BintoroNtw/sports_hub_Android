@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:sports_hub/screens/login.dart';
+import 'package:sports_hub/screens/product_entry_list.dart';
 import 'package:sports_hub/widgets/left_drawer.dart';
 import 'package:sports_hub/screens/productList_form.dart';
 import 'package:sports_hub/widgets/product_card.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -12,9 +16,9 @@ class MyHomePage extends StatelessWidget {
 
   // List items untuk ItemCard
   final List<ItemHomepage> items = [
-    ItemHomepage("All Products", Icons.checklist, Colors.blue),
-    ItemHomepage("My Products", Icons.shopping_bag, Colors.green),
-    ItemHomepage("Create Product", Icons.add_box, Colors.red),
+    ItemHomepage("All Products", Icons.checklist,Colors.blue),
+    ItemHomepage("My Products", Icons.shopping_bag,Colors.green),
+    ItemHomepage("Add Product", Icons.add_box,Colors.red),
   ];
 
   @override
@@ -30,7 +34,7 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      drawer: const LeftDrawer(),
+      drawer: LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -71,11 +75,11 @@ class MyHomePage extends StatelessWidget {
                       // Perubahan: Memberikan 'ProductFormPage' sebagai 'targetPage'
                       // jika itemnya adalah 'Create Product'
                       Widget? targetPage;
-                      if (item.name == "Create Product") {
+                      if (item.name == "Add Product") {
                         targetPage = const ProductFormPage();
                       }
 
-                      return ItemCard(item, targetPage: targetPage);
+                      return ItemCard(item);
                     }).toList(),
                   ),
                 ],
@@ -116,3 +120,96 @@ class InfoCard extends StatelessWidget {
     );
   }
 }
+
+class ItemHomepage {
+  final String name;
+  final IconData icon;
+  final Color color;
+  ItemHomepage(this.name, this.icon,this.color);
+}
+
+class ItemCard extends StatelessWidget {
+  final ItemHomepage item;
+
+  const ItemCard(this.item, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
+    return Material(
+      color: item.color,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+          onTap: () async {
+          // Tampilkan snackbar info
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text("Kamu menekan tombol ${item.name}!")),
+            );
+          // Navigasi sesuai tombol
+          if (item.name == "Add Product") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProductFormPage()),
+            );
+          } else if (item.name == "All Products") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProductEntryListPage(filterByUser: false,)),
+              );
+
+          } else if (item.name == "My Products") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ProductEntryListPage(filterByUser: true,)),
+            );
+          }else if (item.name == "Logout") {
+            final response = await request.logout(
+              "http://localhost:8000/auth/logout/",
+            );
+            if (context.mounted) {
+              String message = response["message"];
+              if (response["status"] == true) {
+                String uname = response["username"];
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("$message See you again, $uname."),
+                  ),
+                );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Logout gagal: $message")),
+                );
+              }
+            }
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(item.icon, color: Colors.white, size: 30.0),
+                const SizedBox(height: 3),
+                Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

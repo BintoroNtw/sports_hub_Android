@@ -5,10 +5,10 @@ import 'package:sports_hub/screens/product_detail.dart';
 import 'package:sports_hub/widgets/product_entry_card.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:sports_hub/models/product_entry.dart';
 
 class ProductEntryListPage extends StatefulWidget {
-  const ProductEntryListPage({super.key});
+  final bool filterByUser;
+  const ProductEntryListPage({super.key,this.filterByUser=false});
 
   @override
   State<ProductEntryListPage> createState() => _ProductEntryListPageState();
@@ -16,11 +16,8 @@ class ProductEntryListPage extends StatefulWidget {
 
 class _ProductEntryListPageState extends State<ProductEntryListPage> {
   Future<List<ProductEntry>> fetchProduct(CookieRequest request) async {
-    // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)!
-    // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-    // If you using chrome,  use URL http://localhost:8000
 
-    final response = await request.get('http://[YOUR_APP_URL]/json/');
+    final response = await request.get('http://localhost:8000/json/');
 
     // Decode response to json format
     var data = response;
@@ -38,6 +35,7 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    final username = request.jsonData["username"];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Entry List'),
@@ -46,31 +44,32 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
       body: FutureBuilder(
         future: fetchProduct(request),
         builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child:
                   Text(
                     'There are no product in sports hub yet.',
                     style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
                   ),
-                  SizedBox(height: 8),
-                ],
               );
             } else {
+              List<ProductEntry> products = snapshot.data!;
+              if (widget.filterByUser) {
+                products = products.where((p) => p.userId == username).toList();
+              }
               return ListView.builder(
-                itemCount: snapshot.data!.length,
+                itemCount: products.length,
                 itemBuilder: (_, index) => ProductEntryCard(
-                  product: snapshot.data![index],
+                  product: products[index],
                   onTap: () {
-                    // Navigate to news detail page
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ProductDetailPage(
-                          product: snapshot.data![index],
+                          product: products[index],
                         ),
                       ),
                     );

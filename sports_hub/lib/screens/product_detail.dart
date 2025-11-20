@@ -6,13 +6,6 @@ class ProductDetailPage extends StatelessWidget {
 
   const ProductDetailPage({super.key, required this.product});
 
-  String _formatDate(DateTime date) {
-    // Simple date formatter without intl package
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +18,6 @@ class ProductDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thumbnail image
             if (product.thumbnail.isNotEmpty)
               Image.network(
                 'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(product.thumbnail)}',
@@ -46,7 +38,6 @@ class ProductDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Featured badge
                   if (product.isFeatured)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -65,9 +56,8 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                     ),
 
-                  // Title
                   Text(
-                    product.title,
+                    product.name,
                     style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -75,7 +65,6 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Category and Date
                   Row(
                     children: [
                       Container(
@@ -95,37 +84,13 @@ class ProductDetailPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        _formatDate(product.createdAt),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Views count
-                  Row(
-                    children: [
-                      Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${product.productViews} views',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
                     ],
                   ),
 
                   const Divider(height: 32),
 
-                  // Full content
                   Text(
-                    product.content,
+                    product.description,
                     style: const TextStyle(
                       fontSize: 16.0,
                       height: 1.6,

@@ -48,7 +48,7 @@ class ProductEntryCard extends StatelessWidget {
 
                 // Title
                 Text(
-                  product.title,
+                  product.name,
                   style: const TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
@@ -62,9 +62,9 @@ class ProductEntryCard extends StatelessWidget {
 
                 // Content preview
                 Text(
-                  product.content.length > 100
-                      ? '${product.content.substring(0, 100)}...'
-                      : product.content,
+                  product.description.length > 100
+                      ? '${product.description.substring(0, 100)}...'
+                      : product.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.black54),
